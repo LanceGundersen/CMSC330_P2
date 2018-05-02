@@ -1,3 +1,8 @@
+#include <typeinfo>
+#include <cstring>
+
+using namespace std;
+
 class Eq: public SubExpression
 {
 public:
