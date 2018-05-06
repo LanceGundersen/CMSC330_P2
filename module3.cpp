@@ -1,67 +1,62 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
+
 using namespace std;
 
+#include "main.h"
 #include "expression.h"
 #include "subexpression.h"
 #include "symboltable.h"
 #include "parse.h"
-#include <sstream>
-#include <fstream>
 
 SymbolTable symbolTable;
 
-void parseAssignments(stringstream &in);
-
 int main()
 {
-    const int SIZE = 256;
-    Expression* expression;
-    char paren, comma, line[SIZE];
+	const int SIZE = 256;
+	Expression* expression;
+	char paren, comma, line[SIZE];
 
-    ifstream fin("input.txt");
-    fin.open("input.txt");
+	ifstream fin("expression.txt");
 
-    while(true) {
+	while (fin.good())
+	{
+		symbolTable = SymbolTable();
+		fin.getline(line, SIZE);
 
-        symbolTable.init();
+		stringstream in(line, ios_base::in);
+		in >> paren;
+		cout << line << " ";
 
-        fin.getline(line, SIZE);
-
-        if(!fin) {
-
-            break;
-        }
-
-        stringstream in(line, ios_base::in);
-
-        in >> paren;
-        cout << line << " ";
-        expression = SubExpression::parse(in);
-        in >> comma;
-        parseAssignments(in);
-        int result = expression->evaluate();
-        cout << "Value = " << result << endl;
-
-
-    }
-    return 0;
+		try
+		{
+			expression = SubExpression::parse(in);
+			in >> comma;
+			parseVars(in);
+			double result = expression->evaluate();
+			cout << "Value = " << result << endl;
+		}
+		catch (int expressionException) {
+			cout << "Invalid Expression" << endl;
+			break;
+		}
+	}
+	return 0;
 }
 
-void parseAssignments(stringstream &in)
+void parseVars(stringstream& in)
 {
-    char assignop, delimiter, junk;
-    string variable;
-    int value;
-
-    symbolTable.init();
-    do
-    {
-        variable = parseName(in);
-         in >> ws >> assignop >> value >> delimiter;
-        symbolTable.insert(variable, value);
-    }
-    while (delimiter == ',');
+	char assignop, delim;
+	string var;
+	double value;
+	do
+	{
+		var = parseName(in);
+		in >> ws >> assignop >> value >> delim;
+		symbolTable.insert(var, value);
+	} while (delim == ',');
 }
 

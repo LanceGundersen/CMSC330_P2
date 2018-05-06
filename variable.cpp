@@ -1,4 +1,4 @@
-#include <sstream>
+#include <strstream>
 #include <vector>
 using namespace std;
 
@@ -9,7 +9,7 @@ using namespace std;
 
 extern SymbolTable symbolTable;
 
-int Variable::evaluate()
+double Variable::evaluate()
 {
-    return symbolTable.lookUp(name);
+	return symbolTable.lookUp(name);
 }

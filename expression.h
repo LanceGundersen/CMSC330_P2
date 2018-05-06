@@ -1,6 +1,4 @@
-#
-class Expression
-{
-public: 
-    virtual int evaluate() = 0;
+class Expression {
+	public:
+		virtual double evaluate() = 0;
 };

@@ -1,11 +1,11 @@
-class Variable: public Operand
+class Variable : public Operand
 {
 public:
-    Variable(string name)
-    {
-        this->name = name;
-    }
-    int evaluate();
+	Variable(string name)
+	{
+		this->name = name;
+	}
+	double evaluate();
 private:
-    string name;
+	string name;
 };

@@ -1,4 +1,6 @@
 #include <iostream>
+#include <sstream>
+
 using namespace std;
 
 #include "expression.h"
@@ -8,95 +10,70 @@ using namespace std;
 #include "minus.h"
 #include "times.h"
 #include "divide.h"
-#include "ge.h"
-#include "geq.h"
-#include "le.h"
-#include "leq.h"
-#include "eq.h"
-#include "not.h"
-#include "and.h"
+#include "greaterthan.h"
+#include "lessthan.h"
 #include "or.h"
-#include "tern.h"
-#include <sstream>
-#include <fstream>
+#include "and.h"
+#include "isequal.h"
+#include "negate.h"
 
 SubExpression::SubExpression(Expression* left, Expression* right)
 {
-    this->left = left;
-    this->right = right;
+	this->left = left;
+	this->right = right;
 }
 
 Expression* SubExpression::parse(stringstream &in)
 {
-    Expression* left;
-    Expression* right;
-    Expression *tern;
-    char operation, paren, junk;
+	Expression* left;
+	Expression* right;
+	char op, paren;
 
-    left = Operand::parse(in); // x
-    in >> operation;       // <
-    right = Operand::parse(in);   // y
+	left = Operand::parse(in);
+	in >> op;
 
-    in >> ws;
-    if(in.peek() == '?') {
+	if (op == '!')
+	{
+		in >> paren;
+		return new Negate(left, NULL);
+	}
 
-        // get rid of question mark
-        in >> junk;
+	right = Operand::parse(in);
 
-        // get rid of paren
-        in >> paren;
+	if (op == ':')
+	{
+		in >> op;
+		Expression* rightMost = Operand::parse(in);
+		in >> paren;
 
-        tern = SubExpression::parse(in);
-    }
+		if ((int)rightMost->evaluate() == 0)
+			return left;
 
-    in >> paren;
+		return right;
+	}
 
-    switch (operation)
-    {
-        case '+':
-            return new Plus(left, right);
-        case '-':
-            return new Minus(left, right);
-        case '*':
-            return new Times(left, right);
-        case '/':
-            return new Divide(left, right);
+	in >> paren;
 
-        // Hnadling in the event it's greater than or equal
-        case '>':
-            if(in.peek() == '=') {
-                in >> junk;    // get rid of =
-                return new Geq(left, right);
-            }
-            else {
-                return new Ge(left, right);
-            }
-
-            // handling if it's less than or less than or equal too
-        case '<':
-            if(in.peek() == '=') {
-                in >> junk;    // Get rid of  =
-                return new Leq(left, right);
-            }
-            else {
-                return new Le(left, right);
-            }
-        case '=':
-            return new Eq(left, right);
-        case '&':
-            return new And(left, right);
-        case '|':
-            return new Or(left, right);
-        case '!':
-            return new Not(left, right);
-        case ':':
-            // if Expr on the left is true, then value
-            // need to do a check if literal or variable
-            //tern = SubExpression::parse();
-            return new Tern(left, right, tern);
-    }
-
-    //f
-    return 0;
+	switch (op)
+	{
+		case '+':
+			return new Plus(left, right);
+		case '-':
+			return new Minus(left, right);
+		case '*':
+			return new Times(left, right);
+		case '/':
+			return new Divide(left, right);
+		case '>':
+			return new GreaterThan(left, right);
+		case '<':
+			return new LessThan(left, right);
+		case '|':
+			return new Or(left, right);
+		case '&':
+			return new And(left, right);
+		case '=':
+			return new IsEqual(left, right);
+	}
+	return 0;
 }
-        

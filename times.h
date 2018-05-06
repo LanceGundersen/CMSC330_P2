@@ -1,11 +1,12 @@
-class Times: public SubExpression
+class Times : public SubExpression
 {
 public:
-    Times(Expression* left, Expression* right): SubExpression(left, right)
-    {
-    }
-    int evaluate()
-    {
-        return left->evaluate() * right->evaluate();
-    }
+	Times(Expression* left, Expression* right) : SubExpression(left, right)
+	{
+	}
+	double evaluate()
+	{
+		return left->evaluate() * right->evaluate();
+	}
 };
+
